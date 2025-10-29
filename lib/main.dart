@@ -1,66 +1,58 @@
-import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:novel_we_li/core/routes/app_routes.dart';
+import 'package:novel_we_li/core/themes/app_theme.dart';
+import 'package:novel_we_li/features/presentation/widgets/custom_error_widget.dart';
+import 'package:sizer/sizer.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  bool _hasShownError = false;
+
+  // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    if (!_hasShownError) {
+      _hasShownError = true;
+      // Reset flag after 3 seconds to allow error widget on new screens
+      Future.delayed(Duration(seconds: 5), () {
+        _hasShownError = false;
+      });
+      return CustomErrorWidget(errorDetails: details);
+    }
+    return SizedBox.shrink();
+  };
+  // 🚨 CRITICAL: Device orientation lock - DO NOT REMOVE
+  Future.wait([
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
+  ]).then((value) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+    return Sizer(
+      builder: (context, orientation, screenType) {
+        return MaterialApp(
+          title: 'novelreader',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.light,
+          // 🚨 CRITICAL: NEVER REMOVE OR MODIFY
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
+              child: child!,
+            );
+          },
+          // 🚨 END CRITICAL SECTION
+          debugShowCheckedModeBanner: false,
+          routes: AppRoutes.routes,
+          initialRoute: AppRoutes.initial,
+        );
+      },
     );
   }
 }
