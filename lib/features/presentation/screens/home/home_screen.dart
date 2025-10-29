@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 //
 import 'package:novel_we_li/core/themes/app_theme.dart';
+import 'package:novel_we_li/core/injection/injection_container.dart';
+//
+import 'package:novel_we_li/features/presentation/bloc/home/home_bloc.dart';
+//
 import 'package:novel_we_li/features/presentation/screens/home/widgets/browse_categories_section.dart';
 import 'package:novel_we_li/features/presentation/screens/home/widgets/featured_novels_carousel.dart';
 import 'package:novel_we_li/features/presentation/screens/home/widgets/popular_this_week_carousel.dart';
 import 'package:novel_we_li/features/presentation/screens/home/widgets/recently_updated_carousel.dart';
 import 'package:novel_we_li/features/presentation/screens/home/widgets/recommended_for_you_carousel.dart';
+//
 import 'package:novel_we_li/features/presentation/widgets/custom_app_bar.dart';
 import 'package:novel_we_li/features/presentation/widgets/custom_bottom_bar.dart';
 import 'package:novel_we_li/features/presentation/widgets/custom_icon_widget.dart';
@@ -21,9 +27,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
-  bool _isRefreshing = false;
   late AnimationController _fabAnimationController;
   bool _showFab = true;
+
   @override
   void initState() {
     super.initState();
@@ -50,137 +56,168 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _onRefresh() async {
-    if (_isRefreshing) return;
-
-    setState(() => _isRefreshing = true);
-    HapticFeedback.mediumImpact();
-
-    // Simulate network refresh
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() => _isRefreshing = false);
-      HapticFeedback.lightImpact();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
-      appBar: CustomAppBar(
-        title: 'NovelReader',
-        variant: CustomAppBarVariant.standard,
-        showSearchIcon: true,
-        onSearchPressed: () {
-          HapticFeedback.lightImpact();
-          Navigator.pushNamed(context, '/search-screen');
-        },
-        actions: [
-          IconButton(
-            icon: CustomIconWidget(iconName: 'notifications_outlined', color: AppTheme.lightTheme.colorScheme.onSurface, size: 24),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              _showNotificationsBottomSheet();
-            },
-            tooltip: 'Notificaciones',
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        color: AppTheme.lightTheme.colorScheme.primary,
-        backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-        child: CustomScrollView(
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            if (_isRefreshing)
-              SliverToBoxAdapter(
-                child: Container(
-                  height: 4,
-                  child: LinearProgressIndicator(
-                    backgroundColor: AppTheme.lightTheme.colorScheme.outline.withValues(alpha: 0.2),
-                    valueColor: AlwaysStoppedAnimation<Color>(AppTheme.lightTheme.colorScheme.primary),
-                  ),
-                ),
-              ),
-            SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 2.h),
-
-                  // Welcome Section
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '¡Bienvenido de vuelta!',
-                          style: AppTheme.lightTheme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700, color: AppTheme.lightTheme.colorScheme.onSurface),
-                        ),
-                        SizedBox(height: 0.5.h),
-                        Text('Descubre nuevas historias increíbles', style: AppTheme.lightTheme.textTheme.bodyLarge?.copyWith(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.7))),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 3.h),
-
-                  // Featured Novels Carousel
-                  const FeaturedNovelsCarousel(),
-
-                  SizedBox(height: 3.h),
-
-                  // Recently Updated Carousel
-                  const RecentlyUpdatedCarousel(),
-
-                  SizedBox(height: 3.h),
-
-                  // Popular This Week Carousel
-                  const PopularThisWeekCarousel(),
-
-                  SizedBox(height: 3.h),
-
-                  // Recommended For You Carousel
-                  const RecommendedForYouCarousel(),
-
-                  SizedBox(height: 3.h),
-
-                  // Browse Categories Section
-                  const BrowseCategoriesSection(),
-
-                  SizedBox(height: 10.h), // Extra space for bottom navigation
-                ],
-              ),
+    return BlocProvider(
+      create: (context) => sl<HomeBloc>()..add(LoadHomeData()),
+      child: Scaffold(
+        backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
+        appBar: CustomAppBar(
+          title: 'NovelReader',
+          variant: CustomAppBarVariant.standard,
+          showSearchIcon: true,
+          onSearchPressed: () {
+            HapticFeedback.lightImpact();
+            Navigator.pushNamed(context, '/search-screen');
+          },
+          actions: [
+            IconButton(
+              icon: CustomIconWidget(iconName: 'notifications_outlined', color: AppTheme.lightTheme.colorScheme.onSurface, size: 24),
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                _showNotificationsBottomSheet();
+              },
+              tooltip: 'Notificaciones',
             ),
           ],
         ),
-      ),
+        body: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            if (state is HomeLoading) {
+              return Center(child: CircularProgressIndicator(color: AppTheme.lightTheme.colorScheme.primary));
+            }
 
-      floatingActionButton: AnimatedBuilder(
-        animation: _fabAnimationController,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _fabAnimationController.value,
-            child: FloatingActionButton(
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                Navigator.pushNamed(context, '/search-screen');
-              },
-              backgroundColor: AppTheme.lightTheme.colorScheme.secondary,
-              foregroundColor: Colors.white,
-              elevation: 6,
-              child: CustomIconWidget(iconName: 'search', color: Colors.white, size: 28),
-            ),
-          );
-        },
-      ),
+            if (state is HomeError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomIconWidget(iconName: 'error_outline', color: AppTheme.lightTheme.colorScheme.error, size: 48),
+                    SizedBox(height: 2.h),
+                    Text('Error al cargar los datos', style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(color: AppTheme.lightTheme.colorScheme.error)),
+                    SizedBox(height: 1.h),
+                    Text(
+                      state.message,
+                      style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 3.h),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<HomeBloc>().add(LoadHomeData());
+                      },
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              );
+            }
 
-      bottomNavigationBar: CustomBottomBar(currentIndex: 0, variant: CustomBottomBarVariant.standard, items: []),
+            if (state is HomeLoaded) {
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context.read<HomeBloc>().add(RefreshHomeData());
+                  // Wait for the refresh to complete
+                  await Future.delayed(const Duration(seconds: 1));
+                },
+                color: AppTheme.lightTheme.colorScheme.primary,
+                backgroundColor: AppTheme.lightTheme.colorScheme.surface,
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    if (state.isRefreshing)
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 4,
+                          child: LinearProgressIndicator(
+                            backgroundColor: AppTheme.lightTheme.colorScheme.outline.withValues(alpha: 0.2),
+                            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.lightTheme.colorScheme.primary),
+                          ),
+                        ),
+                      ),
+                    SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 2.h),
+
+                          // Welcome Section
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '¡Bienvenido de vuelta!',
+                                  style: AppTheme.lightTheme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700, color: AppTheme.lightTheme.colorScheme.onSurface),
+                                ),
+                                SizedBox(height: 0.5.h),
+                                Text(
+                                  'Descubre nuevas historias increíbles',
+                                  style: AppTheme.lightTheme.textTheme.bodyLarge?.copyWith(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(height: 3.h),
+
+                          // Featured Novels Carousel
+                          FeaturedNovelsCarousel(novels: state.featuredNovels),
+
+                          SizedBox(height: 3.h),
+
+                          // Recently Updated Carousel
+                          RecentlyUpdatedCarousel(novels: state.recentlyUpdatedNovels),
+
+                          SizedBox(height: 3.h),
+
+                          // Popular This Week Carousel
+                          PopularThisWeekCarousel(novels: state.popularNovels),
+
+                          SizedBox(height: 3.h),
+
+                          // Recommended For You Carousel
+                          RecommendedForYouCarousel(novels: state.recommendedNovels),
+
+                          SizedBox(height: 3.h),
+
+                          // Browse Categories Section
+                          const BrowseCategoriesSection(),
+
+                          SizedBox(height: 10.h), // Extra space for bottom navigation
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
+        ),
+        floatingActionButton: AnimatedBuilder(
+          animation: _fabAnimationController,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _fabAnimationController.value,
+              child: FloatingActionButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  Navigator.pushNamed(context, '/search-screen');
+                },
+                backgroundColor: AppTheme.lightTheme.colorScheme.secondary,
+                foregroundColor: Colors.white,
+                elevation: 6,
+                child: CustomIconWidget(iconName: 'search', color: Colors.white, size: 28),
+              ),
+            );
+          },
+        ),
+        bottomNavigationBar: CustomBottomBar(currentIndex: 0, variant: CustomBottomBarVariant.standard, items: []),
+      ),
     );
   }
 
@@ -219,9 +256,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     height: 0.5.h,
                     decoration: BoxDecoration(color: AppTheme.lightTheme.colorScheme.outline, borderRadius: BorderRadius.circular(2)),
                   ),
-
                   SizedBox(height: 2.h),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -240,7 +275,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
             ),
-
             Expanded(
               child: notifications.isEmpty
                   ? Center(
@@ -248,9 +282,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CustomIconWidget(iconName: 'notifications_off', color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.4), size: 48),
-
                           SizedBox(height: 2.h),
-
                           Text('No hay notificaciones', style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.6))),
                         ],
                       ),
@@ -261,7 +293,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       separatorBuilder: (context, index) => Divider(color: AppTheme.lightTheme.colorScheme.outline.withValues(alpha: 0.2), height: 1),
                       itemBuilder: (context, index) {
                         final notification = notifications[index];
-
                         return ListTile(
                           contentPadding: EdgeInsets.symmetric(vertical: 1.h),
                           leading: Container(
@@ -280,16 +311,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 0.5.h),
-
                               Text(
                                 notification["message"] as String,
                                 style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.7)),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-
                               SizedBox(height: 0.5.h),
-
                               Text(
                                 notification["time"] as String,
                                 style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(color: AppTheme.lightTheme.colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 10.sp),

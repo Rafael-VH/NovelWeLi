@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
+import 'core/injection/injection_container.dart' as di;
 //
 import 'package:novel_we_li/core/routes/app_routes.dart';
 import 'package:novel_we_li/core/themes/app_theme.dart';
@@ -8,9 +9,13 @@ import 'package:novel_we_li/features/presentation/widgets/custom_error_widget.da
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize dependency injection
+  await di.init();
+
   bool _hasShownError = false;
 
-  // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
+  // CRITICAL: Custom error handling - DO NOT REMOVE
   ErrorWidget.builder = (FlutterErrorDetails details) {
     if (!_hasShownError) {
       _hasShownError = true;
@@ -22,7 +27,7 @@ void main() async {
     }
     return SizedBox.shrink();
   };
-  // 🚨 CRITICAL: Device orientation lock - DO NOT REMOVE
+  // CRITICAL: Device orientation lock - DO NOT REMOVE
   Future.wait([
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
   ]).then((value) {
@@ -42,14 +47,14 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.light,
-          // 🚨 CRITICAL: NEVER REMOVE OR MODIFY
+          // CRITICAL: NEVER REMOVE OR MODIFY
           builder: (context, child) {
             return MediaQuery(
               data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
               child: child!,
             );
           },
-          // 🚨 END CRITICAL SECTION
+          // END CRITICAL SECTION
           debugShowCheckedModeBanner: false,
           routes: AppRoutes.routes,
           initialRoute: AppRoutes.initial,

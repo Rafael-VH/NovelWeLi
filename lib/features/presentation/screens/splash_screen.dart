@@ -18,7 +18,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late Animation<double> _logoFadeAnimation;
   late Animation<double> _progressAnimation;
   bool _isInitialized = false;
-  double _initializationProgress = 0.0;
 
   @override
   void initState() {
@@ -94,7 +93,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   Future<void> _updateProgress(double progress, String message) async {
     if (mounted) {
       setState(() {
-        _initializationProgress = progress;
       });
     }
   }

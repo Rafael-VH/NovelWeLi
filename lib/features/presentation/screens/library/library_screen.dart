@@ -23,7 +23,6 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
   int _selectedSegment = 0;
   String _searchQuery = '';
   String _currentSort = 'recent';
-  bool _isRefreshing = false;
   bool _isBatchSelectionMode = false;
   final Set<int> _selectedNovels = {};
   late AnimationController _animationController;
@@ -394,13 +393,11 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
 
   Future<void> _onRefresh() async {
     setState(() {
-      _isRefreshing = true;
     });
     HapticFeedback.lightImpact();
     // Simulate sync operation
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
-      _isRefreshing = false;
     });
   }
 
