@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 //
-import 'package:novel_we_li/core/app_export.dart';
 import 'package:novel_we_li/features/presentation/widgets/custom_icon_widget.dart';
 
 class ChapterListSection extends StatefulWidget {

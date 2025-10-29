@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+//
 import 'package:novel_we_li/core/routes/app_routes.dart';
 import 'package:novel_we_li/core/themes/app_theme.dart';
 

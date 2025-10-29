@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sizer/sizer.dart';
+//
 import 'package:novel_we_li/core/themes/app_theme.dart';
 import 'package:novel_we_li/features/presentation/widgets/custom_icon_widget.dart';
 import 'package:novel_we_li/features/presentation/widgets/custom_image_widget.dart';
-import 'package:sizer/sizer.dart';
 
 class RecommendedForYouCarousel extends StatelessWidget {
   const RecommendedForYouCarousel({super.key});

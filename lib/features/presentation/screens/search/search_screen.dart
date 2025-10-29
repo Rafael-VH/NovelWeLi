@@ -6,16 +6,16 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:sizer/sizer.dart';
-import 'package:novel_we_li/core/app_export.dart';
-import '../../widgets/custom_bottom_bar.dart';
-import '../../widgets/custom_icon_widget.dart';
-import './widgets/advanced_filter_sheet.dart';
-import './widgets/filter_chips_widget.dart';
-import './widgets/popular_searches_widget.dart';
-import './widgets/recent_searches_widget.dart';
-import './widgets/search_bar_widget.dart';
-import './widgets/search_results_widget.dart';
-import './widgets/skeleton_loading_widget.dart';
+//
+import 'package:novel_we_li/features/presentation/screens/search/widgets/advanced_filter_sheet.dart';
+import 'package:novel_we_li/features/presentation/screens/search/widgets/filter_chips_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/search/widgets/popular_searches_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/search/widgets/recent_searches_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/search/widgets/search_bar_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/search/widgets/search_results_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/search/widgets/skeleton_loading_widget.dart';
+import 'package:novel_we_li/features/presentation/widgets/custom_bottom_bar.dart';
+import 'package:novel_we_li/features/presentation/widgets/custom_icon_widget.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
-import 'package:novel_we_li/core/app_export.dart';
+//
+import 'package:novel_we_li/features/presentation/widgets/custom_icon_widget.dart';
+import 'package:novel_we_li/features/presentation/widgets/custom_image_widget.dart';
 
 class PopularSearchesWidget extends StatelessWidget {
   final List<Map<String, dynamic>> popularSearches;

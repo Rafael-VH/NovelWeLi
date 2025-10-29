@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 //
-import 'package:novel_we_li/core/app_export.dart';
+import 'package:novel_we_li/core/themes/app_theme.dart';
+import 'package:novel_we_li/features/presentation/widgets/custom_icon_widget.dart';
+import 'package:novel_we_li/features/presentation/widgets/custom_image_widget.dart';
 
 class NovelCardWidget extends StatelessWidget {
   final Map<String, dynamic> novel;

@@ -4,10 +4,10 @@ import 'package:sizer/sizer.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 //
 import 'package:novel_we_li/core/themes/app_theme.dart';
-import './widgets/auto_scroll_widget.dart';
-import './widgets/reading_controls_widget.dart';
-import './widgets/reading_settings_widget.dart';
-import './widgets/text_selection_menu_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/reader/widgets/auto_scroll_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/reader/widgets/reading_controls_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/reader/widgets/reading_settings_widget.dart';
+import 'package:novel_we_li/features/presentation/screens/reader/widgets/text_selection_menu_widget.dart';
 
 class ReaderScreen extends StatefulWidget {
   const ReaderScreen({super.key});
